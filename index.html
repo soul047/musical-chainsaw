@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>삼범 AI</title>
+</head>
+<body>
+
+<h2>삼범 AI</h2>
+
+<select id="voice">
+  <option value="gpt">GPT 목소리</option>
+  <option value="funny">재미나이 목소리</option>
+</select>
+
+<br><br>
+
+<input id="msg" placeholder="말해라 인간" />
+<button onclick="send()">전송</button>
+
+<p id="reply"></p>
+
+<script>
+async function send() {
+  const msg = document.getElementById("msg").value;
+  const voice = document.getElementById("voice").value;
+
+  const res = await fetch("http://localhost:8000/chat", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({message: msg, voice})
+  });
+
+  const data = await res.json();
+  document.getElementById("reply").innerText = data.text;
+
+  speak(data.text, voice);
+}
+
+function speak(text, voice) {
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "ko-KR";
+
+  if (voice === "funny") {
+    utter.pitch = 1.6;
+    utter.rate = 1.2;
+  } else {
+    utter.pitch = 1.0;
+    utter.rate = 1.0;
+  }
+
+  speechSynthesis.speak(utter);
+}
+</script>
+
+</body>
+</html>
